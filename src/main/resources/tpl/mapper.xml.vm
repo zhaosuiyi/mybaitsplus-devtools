@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${package.Mapper}.${table.mapperName}">
+#if(${enableCache})
+	<!-- 开启二级缓存 -->
+	<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>
+#end
+
+#if(${baseResultMap})
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="${package.Entity}.${entity}">
+#foreach($field in ${table.fields})
+#if(${field.keyFlag})
+		<id column="${field.name}" property="${field.propertyName}" />
+#else
+		<result column="${field.name}" property="${field.propertyName}" />
+#end
+#end
+	</resultMap>
+#end
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ${table.fieldNames}
+    </sql>
+
+    <!-- 通用查询条件 -->
+    <sql id="Base_Where">
+        <where>
+            <if test="cm.keyword != null and cm.keyword != ''">
+                and (
+                #foreach($field in ${table.fields})
+                    or ${field.name} like CONCAT('%',#{cm.keyword},'%')
+                #end
+                )
+            </if>
+
+            #foreach($field in ${table.fields})
+                <if test="cm.${field.propertyName} != null and cm.${field.propertyName} != ''">
+                    and  ${field.name} like CONCAT('%',#{cm.${field.propertyName}},'%')
+                </if>
+            #end
+
+        </where>
+    </sql>
+
+    <select id="selectObjsPage" resultType="${package.Entity}.${entity}">
+        select
+        <include refid="Base_Column_List"/>
+        from ${table.name}
+        <include refid="Base_Where"/>
+    </select>
+
+	<select id="selectIdPage" resultType="java.lang.Long">
+		select id from ${table.name}
+        <include refid="Base_Where"/>
+	</select>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into ${table.name} (
+        #foreach($field in ${table.fields})
+            #if($foreach.count==${table.fields.size()})
+                ${field.name}
+            #else
+                ${field.name},
+            #end
+        #end
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+        (
+            #foreach($field in ${table.fields})
+                #if($foreach.count==${table.fields.size()})
+                    #{item.${field.propertyName}}##
+                #else
+                    #{item.${field.propertyName}},##
+                #end##
+            #end
+        )
+        </foreach>
+    </insert>
+
+</mapper>
