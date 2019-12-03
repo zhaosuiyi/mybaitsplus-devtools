@@ -1,5 +1,6 @@
 package com.mybaitsplus.devtools.core.util;
 
+import com.mybaitsplus.devtools.core.exception.BusinessException;
 import com.mybaitsplus.devtools.core.exception.ExcelException;
 import jxl.Cell;
 import jxl.Sheet;
@@ -8,8 +9,8 @@ import jxl.write.Label;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -929,5 +930,68 @@ public class ExcelUtil  {
         }
         return null ;
     }
+    /**
+     * 这是一个通用的方法，
+     * @param sheetName
+     *            表格sheet名
+     * @param headers
+     *            表格属性列名数组
+     * @param headersField
+     * 			  表格属性列名数组所对应的Map的Key值的集合
+     * @param excelData
+     *            需要显示的数据集合,集合中一定要放置符合Map风格的类的对象。此方法支持的
+     *            javabean属性的数据类型有基本数据类型及String,Date,byte[](图片数据)
+     * @param response
+     *            与输出设备关联的流对象，可以将EXCEL文档导出到本地文件或者网络中
+     */
+    public  static void exportExcel(String sheetName,String[] headers,String[] headersField,List<Map<String, Object>> excelData
+            ,OutputStream out){
 
+        // 声明一个工作薄
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        int iMaxLines = 65534;
+        // 生成一个表格
+        int index = 0;
+        int page =1;
+        try {
+            HSSFSheet sheet = workbook.createSheet(sheetName);
+            // 设置表格默认列宽度为15个字节
+            sheet.setDefaultColumnWidth((int) 15);
+            // 产生表格标题行
+            HSSFRow row = sheet.createRow(0);
+            for (int i = 0; i < headers.length; i++) {
+                HSSFCell cell = row.createCell(i);
+                HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+                cell.setCellValue(text);
+            }
+            // 遍历集合数据，产生数据行
+            Iterator<Map<String, Object>> it = excelData.iterator();
+
+            while (it.hasNext()) {
+                index++;
+                row = sheet.createRow(index);
+                Map<String, Object> t =  it.next();
+                int m=0;
+                for(short n = 0;n<headersField.length;n++) {
+                    if(n==0)m=0;
+                    HSSFCell cell = row.createCell(m);
+                    m++;
+                    Object value = t.get(headersField[n]);
+                    String textValue = value==null?null:value.toString();
+                    if (textValue != null) {
+                        cell.setCellValue(textValue);
+                    }
+                }
+            }
+            String filename = sheetName + ".xls";
+            try {
+               workbook.write(out);// 将数据写出去
+            } finally {
+                out.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessException("导出Excel失败，请联系网站管理员！");
+        }
+    }
 }
