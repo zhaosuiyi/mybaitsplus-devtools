@@ -34,6 +34,7 @@ public class YYYYMMStrategy implements Strategy {
     }
 
     public String getParamValue(Object val,String paramName) {
+        if(val==null){ return null ;}
         if (val.toString().contains(paramName)) {
             if(val instanceof Map) {
                 for (Map.Entry<String, Object> e : ((Map<String, Object>) val).entrySet()) {
