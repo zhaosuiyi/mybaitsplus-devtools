@@ -11,11 +11,11 @@ import jxl.write.WritableWorkbook;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -948,20 +948,19 @@ public class ExcelUtil  {
             ,OutputStream out){
 
         // 声明一个工作薄
-        HSSFWorkbook workbook = new HSSFWorkbook();
-        int iMaxLines = 65534;
+        SXSSFWorkbook wb = new SXSSFWorkbook();
         // 生成一个表格
         int index = 0;
         int page =1;
         try {
-            HSSFSheet sheet = workbook.createSheet(sheetName);
+            SXSSFSheet sheet = wb.createSheet(sheetName);
             // 设置表格默认列宽度为15个字节
             sheet.setDefaultColumnWidth((int) 15);
             // 产生表格标题行
-            HSSFRow row = sheet.createRow(0);
+            Row row = sheet.createRow(0);
             for (int i = 0; i < headers.length; i++) {
-                HSSFCell cell = row.createCell(i);
-                HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+                org.apache.poi.ss.usermodel.Cell  cell = row.createCell(i);
+                org.apache.poi.xssf.usermodel.XSSFRichTextString text = new XSSFRichTextString(headers[i]);
                 cell.setCellValue(text);
             }
             // 遍历集合数据，产生数据行
@@ -974,7 +973,7 @@ public class ExcelUtil  {
                 int m=0;
                 for(short n = 0;n<headersField.length;n++) {
                     if(n==0)m=0;
-                    HSSFCell cell = row.createCell(m);
+                    org.apache.poi.ss.usermodel.Cell cell = row.createCell(m);
                     m++;
                     Object value = t.get(headersField[n]);
                     String textValue = value==null?null:value.toString();
@@ -983,9 +982,9 @@ public class ExcelUtil  {
                     }
                 }
             }
-            String filename = sheetName + ".xls";
+            String filename = sheetName + ".xlsx";
             try {
-               workbook.write(out);// 将数据写出去
+                wb.write(out);// 将数据写出去
             } finally {
                 out.close();
             }
