@@ -28,7 +28,7 @@
         <commons-beanutils.version>1.9.3</commons-beanutils.version>
         <commons-fileupload.version>1.3</commons-fileupload.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
-        <alibaba-fastjson.version>1.2.56</alibaba-fastjson.version>
+        <alibaba-fastjson.version>1.2.83</alibaba-fastjson.version>
         <mysql.version>5.1.40</mysql.version>
         <ojdbc14.version>10.2.4.4.0</ojdbc14.version>
         <javax.mail.version>1.4.7</javax.mail.version>
