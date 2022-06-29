@@ -32,7 +32,7 @@
         <mysql.version>5.1.40</mysql.version>
         <ojdbc14.version>10.2.4.4.0</ojdbc14.version>
         <javax.mail.version>1.4.7</javax.mail.version>
-        <poi.version>4.1.0</poi.version>
+        <poi.version>4.1.1</poi.version>
         <thumbnailator.version>0.4.8</thumbnailator.version>
         <pinyin.version>2.5.0</pinyin.version>
     </properties>
